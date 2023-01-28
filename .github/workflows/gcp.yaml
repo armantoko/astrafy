@@ -3,8 +3,8 @@ name: Build and push Image to Google Cloud
 on:
   push:
     branches: [master]
-  jobs:
-    build-push-gcr:
+jobs:
+  build-push-gcr:
     name: Build and Push to GCR
     runs-on: ubuntu-latest
     env: 
