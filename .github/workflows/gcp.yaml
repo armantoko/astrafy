@@ -3,6 +3,9 @@ name: Build and push Image to Google Cloud
 on:
   push:
     branches: [master]
+  jobs:
+    build-push-gcr:
+    name: Build and Push to GCR
     runs-on: ubuntu-latest
     env: 
       IMAGE_NAME: tweet_app
@@ -23,7 +26,7 @@ on:
         gcloud auth configure-docjer --quiet
 
     - name: Push docker Image to Container Registry (GCR)  
-        env: 
+        env:
           GIT_TAG: v0.1.0
         run: |-
           docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
