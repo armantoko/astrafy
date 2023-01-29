@@ -15,6 +15,7 @@ env:
   IMAGE_NAME: linux_tweet_app
   GITHUB_REF: ${{refs/tags/${{github.ref}}}}
 
+
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
