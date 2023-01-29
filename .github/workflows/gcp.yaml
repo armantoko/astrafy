@@ -25,9 +25,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-      
+
     - name: Configure Google Cloud CLI
-      uses: google-github-actions/setup-gcloud@master
+      uses: google-github-actions/setup-gcloud@v0
       with:
         credentials: ${{ env.GOOGLE_CREDENTIALS }}
 
