@@ -13,7 +13,7 @@ env:
   GOOGLE_REGISTRY: gcr.io
   PROJECT_ID: my-project-id
   IMAGE_NAME: linux_tweet_app
-  GITHUB_REF: ${{refs/tags/${{github.ref}}}}
+  GITHUB_REF: ${{github.ref}}
 
 
 jobs:
