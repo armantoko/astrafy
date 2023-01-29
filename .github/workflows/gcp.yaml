@@ -8,9 +8,9 @@ on:
   pull_request:
     branches:
       - main
-  tag:
-    branches:
-      - main
+  # tag:
+  #   branches:
+  #     - main
 
 env:
   GOOGLE_REGISTRY: gcr.io
@@ -40,10 +40,10 @@ jobs:
         context: .
         push: false
 
-    - name: Tag Docker Image
-      uses: docker/build-push-action@v2
-      if: ${{ is_tag() }}
-      with:
-        context: .
-        push: true
-        tags: ${{ env.GOOGLE_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_TAG }}
+    # - name: Tag Docker Image
+    #   uses: docker/build-push-action@v2
+    #   if: ${{ is_tag() }}
+    #   with:
+    #     context: .
+    #     push: true
+    #     tags: ${{ env.GOOGLE_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_TAG }}
