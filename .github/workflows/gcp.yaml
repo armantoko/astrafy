@@ -32,9 +32,9 @@ jobs:
         credentials: ${{ env.GOOGLE_CREDENTIALS }}
 
 
-    # - uses: google-github-actions/auth@v0
-    #   with: 
-    #     credentials: ${{ env.GOOGLE_CREDENTIALS }}
+    - uses: google-github-actions/auth@v0
+      with: 
+        credentials: ${{ env.GOOGLE_CREDENTIALS }}
 
     - name: Build Docker Image
       run: docker build -t $IMAGE_NAME:latest .
