@@ -12,17 +12,6 @@ on:
       - master
 
 
-name: CI
-
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
-
 jobs:
   build-push-gcr:
     name: Build and Push to GCP
