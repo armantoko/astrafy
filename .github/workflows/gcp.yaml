@@ -30,7 +30,7 @@ jobs:
         credentials_json: '${{ secrets.SERVICE_ACOUNT_KEY }}'
 
     - name: Build Docker Image
-      run: |
+      run: |-
         export IMAGE_TAG=${{ (github.event_name == 'pull_request') ? 'pull_request' : (github.event_name == 'push' ? (github.ref == 'refs/heads/master' ? substr(sha,0,7) : 'no-push') : ref) }}
         echo "Building image with tag: $IMAGE_TAG"
         docker build -t $IMAGE_NAME:$IMAGE_TAG .
@@ -41,7 +41,7 @@ jobs:
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
 
     - name: Push Docker Image to Container Registry (GCR)
-      if: |
+      if: |-
         github.event_name == 'push' &&
         github.ref == 'refs/heads/master' &&
         env.IMAGE_TAG != 'no-push'
