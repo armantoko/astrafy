@@ -32,7 +32,7 @@ jobs:
     - name: Configure Docker Client
       run: |-
 
-        gcloud auth configure-docker europe-west4.pkg.dev --quiet
+        gcloud auth configure-docker europe-west4-docker.pkg.dev --quiet
     #gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
         
     - name: Build Docker Image , when we have pull event only this will work
