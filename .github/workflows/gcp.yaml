@@ -38,7 +38,7 @@ jobs:
       run: docker build -t $IMAGE_NAME:latest .
 
     - name: Tagging the image with the git commit hash and Push Docker Image to Container Registry (GCR) for push events
-      if: github.ref == 'refs/heads/master' && (github.event_name == 'push' || github.event_name == 'pull_request')
+      if: github.ref == 'refs/heads/master' && (github.event_name == 'push_request')
       env: 
         COMMIT_TAG: ${{github.sha}}
       run: |-
