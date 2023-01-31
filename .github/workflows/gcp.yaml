@@ -46,6 +46,7 @@ jobs:
         COMMIT_TAG: ${{github.sha}}  
       run: |
         if [ "${{github.event_name}}" == 'push' ]; then
+          docker build -t $IMAGE_NAME:latest .
           docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
           docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
           docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
@@ -59,6 +60,7 @@ jobs:
         GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
       run: |
         if [ "${{github.ref}}" == 'refs/tags/*' ] && ([ "${{github.event_name}}" == 'create' ] || [ "${{github.event_name}}" == 'delete' ]); then
+          docker build -t $IMAGE_NAME:latest .
           docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
           docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
           docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
