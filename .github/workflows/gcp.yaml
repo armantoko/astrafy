@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  IMAGE_TAG: ${{ env.GITHUB_SHA }}
+  IMAGE_TAG: v1
   IMAGE_NAME: linux_tweet_app
   PROJECT_ID: andiamo-1d849
 
