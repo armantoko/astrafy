@@ -36,7 +36,7 @@ jobs:
         
     - name: Build Docker Image , when we have pull event only this will work
       run: 
-        if [ "${{github.event_name}}" == 'push' ]; then
+        if [ "${{github.event_name}}" == 'pull' ]; then
           docker build -t $IMAGE_NAME:latest .
         fi
 
