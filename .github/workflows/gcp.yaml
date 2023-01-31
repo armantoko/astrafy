@@ -39,6 +39,7 @@ jobs:
         if [ "${{github.event_name}}" == 'pull' ]; then
           docker build -t $IMAGE_NAME:latest .
         fi
+      shell: bash
 
     - name: For every Commit, Tagging the image with the git commit hash and Push Docker Image to Container Registry (GCR)
       env: 
