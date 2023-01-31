@@ -48,7 +48,7 @@ jobs:
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
     - name: Tagging the image with the git commit
       run: |-
-        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:${GIT_COMMIT}
+        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:${{GIT_COMMIT}}
     
 
     - name: Push Docker Image to Container Registry (GCR)
