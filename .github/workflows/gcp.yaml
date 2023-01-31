@@ -35,9 +35,10 @@ jobs:
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
         
     - name: Build Docker Image , when we have pull event only this will work
-      run: 
+       
       if: github.ref == 'refs/heads/master' && github.event_name == 'pull_request'
-          docker build -t $IMAGE_NAME:latest .
+      run: 
+        docker build -t $IMAGE_NAME:latest .
           
     - name: For every Commit, Tagging the image with the git commit hash and Push Docker Image to Container Registry (GCR)
       env: 
