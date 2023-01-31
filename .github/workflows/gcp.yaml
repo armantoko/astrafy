@@ -36,6 +36,9 @@ jobs:
 
 
     - name: using
+      env:
+        GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+
       run: |- 
         if [ github.ref == 'refs/heads/master' && github.event_name == 'push_request' ]; then
           docker build -t $IMAGE_NAME:latest .
