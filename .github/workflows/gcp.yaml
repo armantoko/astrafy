@@ -7,9 +7,8 @@ on:
   pull_request:
     branches:
       - master
-  tag:
-    branches:
-      - master
+  create:
+    types: [tag]
 
 jobs:
   build-push-gcr:
@@ -28,35 +27,43 @@ jobs:
       with:
         credentials_json: '${{ secrets.SERVICE_ACOUNT_KEY }}'
 
-    - name: Get Git SHA
-      id: git_sha
-      run: echo "${{ github.sha }}"
-
     - name: Build Docker Image
-      run: docker build -t $IMAGE_NAME:${{ steps.git_sha.outputs.sha }} .
-    
+      run: docker build -t $IMAGE_NAME:latest .
+
     - name: Automatic Tagging of Releases
       id: increment-git-tag
       run: |
         bash ./scripts/git_update.sh -v major
+
     - name: Configure Docker Client
       run: |-
         gcloud auth configure-docker --quiet
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
-    
-    - name: Push Docker Image to Container Registry (GCR)
+
+    - name: Determine image tag
+      id: determine-tag
       env:
         GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
-        IMAGE_TAG: ${{ (github.event_name == 'pull_request') ? 'pull_request' : (github.event_name == 'push' ? (github.ref == 'refs/heads/master' ? substr(sha,0,7) : 'no-push') : ref) }}
-      run: |
-        if [ "$IMAGE_TAG" == "pull_request" ]; then
-          echo "Image built, but not pushed to the registry."
-        elif [ "$IMAGE_TAG" == "no-push" ]; then
-          echo "Not a push to the master branch, image not built or pushed to registry."
-        else
-          docker tag $IMAGE_NAME:$IMAGE_TAG gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
+      run: |-
+        tag=${{
+          if eq(github.event_name, 'pull_request')
+            then 'pull_request'
+          elif eq(github.event_name, 'push') && eq(github.ref, 'refs/heads/master')
+            then substr(github.sha,0,7)
+          elif eq(github.event_name, 'create')
+            then github.ref
+          else
+            echo "This is not a valid event"
+        }}
+    - name: Push Docker Image to Container Registry (GCR)
+      env:
+        IMAGE_TAG: ${{ steps.determine-tag.env.tag }}
+      run: |-
+        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
+        if [ "$IMAGE_TAG" != "pull_request" ]; then
           docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
         fi
+
 
 
 # name: CI
