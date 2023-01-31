@@ -31,6 +31,7 @@ jobs:
   
     - name: Configure Docker Client
       run: |-
+
         gcloud auth configure-docker europe-west4-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
     #gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
         
@@ -45,7 +46,9 @@ jobs:
       env: 
         COMMIT_TAG: ${{github.sha}}  
       run: |
-        docker build -t europe-west4-docker.pkg.dev/Andiamo/test-repo/art-demo:$COMMIT_TAG .
+        docker build -t $IMAGE_NAME:latest .
+        docker tag $IMAGE_NAME:latest europe-west4-docker.pkg.dev/Andiamo/test-repo/art-demo:$COMMIT_TAG
+        docker push europe-west4-docker.pkg.dev/Andiamo/test-repo/art-demo:$COMMIT_TAG
     #docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
    # docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
     #docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
