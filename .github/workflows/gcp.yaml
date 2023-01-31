@@ -9,15 +9,6 @@ on:
     branches:
       - master
 
- env:
-   GOOGLE_REGISTRY: gcr.io
-   PROJECT_ID: andiamo-1d849
-   IMAGE_NAME: linux_tweet_app
-   GITHUB_REF: ${{github.ref}}
-   GOOGLE_CREDENTIALS: ${{ secrets.SERVICE_ACOUNT_KEY }}
-   GOOGLE_PROJECT_ID: my-project-id
-
-
 jobs:
   build-push-gcr:
     name: Build and Push to GCP
