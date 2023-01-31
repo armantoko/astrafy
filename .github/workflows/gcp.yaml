@@ -1,4 +1,3 @@
-
 name: CI
 
 on:
@@ -6,6 +5,10 @@ on:
     branches:
       - master
   pull_request:
+    branches:
+      - master
+  create:
+    type: tag
     branches:
       - master
 
@@ -26,25 +29,76 @@ jobs:
       with:
         credentials_json: '${{ secrets.SERVICE_ACOUNT_KEY }}'
 
-
     - name: Build Docker Image
-      run: docker build -t $IMAGE_NAME:latest .
-    
-    - name: Automatic Tagging of Releases
-      id: increment-git-tag
       run: |
-        bash ./scripts/git_update.sh -v major
+        export IMAGE_TAG=${{ (github.event_name == 'pull_request') ? 'pull_request' : (github.event_name == 'push' ? (github.ref == 'refs/heads/master' ? substr(sha,0,7) : 'no-push') : ref) }}
+        echo "Building image with tag: $IMAGE_TAG"
+        docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
     - name: Configure Docker Client
       run: |-
         gcloud auth configure-docker --quiet
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
-    
 
     - name: Push Docker Image to Container Registry (GCR)
-      env:
-       GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+      if: |
+        github.event_name == 'push' &&
+        github.ref == 'refs/heads/master' &&
+        env.IMAGE_TAG != 'no-push'
       run: |-
-        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
-        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+        echo "Pushing image to registry with tag: $IMAGE_TAG"
+        docker tag $IMAGE_NAME:$IMAGE_TAG gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
+        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
+
+
+# ---
+
+# name: CI
+
+# on:
+#   push:
+#     branches:
+#       - master
+#   pull_request:
+#     branches:
+#       - master
+
+# jobs:
+#   build-push-gcr:
+#     name: Build and Push to GCP
+#     runs-on: ubuntu-latest
+#     env:
+#       IMAGE_NAME: linux_tweet_app
+#       PROJECT_ID: andiamo-1d849
+#     steps:
+#     - name: Checkout
+#       uses: actions/checkout@v2
+
+#     - name: Authenticate with Google Cloud
+#       id: 'auth'
+#       uses: 'google-github-actions/auth@v0'
+#       with:
+#         credentials_json: '${{ secrets.SERVICE_ACOUNT_KEY }}'
+
+
+#     - name: Build Docker Image
+#       run: docker build -t $IMAGE_NAME:latest .
+    
+#     - name: Automatic Tagging of Releases
+#       id: increment-git-tag
+#       run: |
+#         bash ./scripts/git_update.sh -v major
+#     - name: Configure Docker Client
+#       run: |-
+#         gcloud auth configure-docker --quiet
+#         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
+    
+
+#     - name: Push Docker Image to Container Registry (GCR)
+#       env:
+#        GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+#       run: |-
+#         docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+#         docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+#         docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+#         docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
