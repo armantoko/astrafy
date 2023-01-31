@@ -19,37 +19,39 @@ jobs:
     env:
       IMAGE_NAME: linux_tweet_app
       PROJECT_ID: andiamo-1d849
+      GIT_TAG: ''
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
     - name: Authenticate with Google Cloud
       id: 'auth'
       uses: 'google-github-actions/auth@v0'
       with:
         credentials_json: '${{ secrets.SERVICE_ACOUNT_KEY }}'
-
+    - name: Automatic Tagging of Releases
+      id: increment-git-tag
+      run: |
+        bash ./scripts/git_update.sh -v major
+    - name: Set the Image Tag
+      id: set-image-tag
+      env:
+        GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        SHA: ${{ steps.increment-git-tag.outputs.sha }}
+      run: |
+        echo "::set-env name=IMAGE_TAG::${{ if eq(github.event_name, 'push') && eq(github.ref, 'refs/heads/master') }}${{ substr(sha,0,7) }}{{ else if eq(github.event_name, 'pull_request') }}pull_request{{ else }}$GIT_TAG{{ end }}"
     - name: Build Docker Image
-      run: |-
-        export IMAGE_TAG=${{ (github.event_name == 'pull_request') ? 'pull_request' : (github.event_name == 'push' ? (github.ref == 'refs/heads/master' ? substr(sha,0,7) : 'no-push') : ref) }}
-        echo "Building image with tag: $IMAGE_TAG"
-        docker build -t $IMAGE_NAME:$IMAGE_TAG .
-
+      run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
     - name: Configure Docker Client
       run: |-
         gcloud auth configure-docker --quiet
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
-
     - name: Push Docker Image to Container Registry (GCR)
-      if: |-
-        github.event_name == 'push' &&
-        github.ref == 'refs/heads/master' &&
-        env.IMAGE_TAG != 'no-push'
+      env:
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+      if: env.IMAGE_TAG != 'pull_request'
       run: |-
-        echo "Pushing image to registry with tag: $IMAGE_TAG"
         docker tag $IMAGE_NAME:$IMAGE_TAG gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
         docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
-
 
 # ---
 
