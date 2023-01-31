@@ -17,7 +17,6 @@ jobs:
     env:
       IMAGE_NAME: linux_tweet_app
       PROJECT_ID: andiamo-1d849
-      COMMIT_TAG: ${{github.sha}}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -32,29 +31,32 @@ jobs:
       run: |-
         gcloud auth configure-docker --quiet
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
+        
+    - name: Tagging the image with the git commit hash for push requests, and Push Docker Image to Container Registry (GCR)
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push_request'
+      env: 
+        COMMIT_TAG: ${{github.sha}}
+      run: |-
+        docker build -t $IMAGE_NAME:latest .
+        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
+        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
+        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+    
+    - name: Build Docker Image, and not publish for pull requests
+      if: github.ref == 'refs/heads/master' && github.event_name == 'pull_request'
+      run: docker build -t $IMAGE_NAME:latest .
+  
 
 
-    - name: using
+
+    - name: Push Docker Image to Container Registry (GCR)
+      if: github.ref == 'refs/tags/*' && (github.event_name == 'create' || github.event_name == 'delete')
       env:
         GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
-
-      run: |- 
-        if [ "$GITHUB_REF" == "refs/heads/master" ] && [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
-          docker build -t $IMAGE_NAME:latest .
-        elif [ "$GITHUB_REF" == "refs/heads/master" ] && [ "$GITHUB_EVENT_NAME" == "push" ]; then
-          docker build -t $IMAGE_NAME:latest .
-          docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
-          docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-          docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
-          docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-        elif [ "$GITHUB_REF" == "refs/tags/"* ] && [ "$GITHUB_EVENT_NAME" == "create" ] || [ "$GITHUB_EVENT_NAME" == "delete" ]; then
-          docker build -t $IMAGE_NAME:latest .
-          docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-          docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$(echo $GITHUB_REF | awk -F/ '{print $3}')
-          docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-          docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$(echo $GITHUB_REF | awk -F/ '{print $3}')
-        fi
-      shell: bash
-
-        
-   
+      run: |-
+        docker build -t $IMAGE_NAME:latest .
+        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
