@@ -13,7 +13,7 @@ on:
 
 jobs:
   build-push-gcr:
-    name: Build and Push to GCR
+    name: Build and Push to GCP
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: linux_tweet_app
@@ -28,27 +28,35 @@ jobs:
       with:
         credentials_json: '${{ secrets.SERVICE_ACOUNT_KEY }}'
 
-    - name: Build Docker Image
-      run: |
-        IMAGE_TAG=${{ if eq(github.event_name, 'pull_request') 'pull_request'
-                      else if eq(github.event_name, 'push') && eq(github.ref, 'refs/heads/master') substr(github.sha,0,7)
-                      else if eq(github.event_name, 'tag') github.ref
-                      else 'no-push' }}
-        docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - name: Get Git SHA
+      id: git_sha
+      run: echo "${{ github.sha }}"
 
+    - name: Build Docker Image
+      run: docker build -t $IMAGE_NAME:${{ steps.git_sha.outputs.sha }} .
+    
+    - name: Automatic Tagging of Releases
+      id: increment-git-tag
+      run: |
+        bash ./scripts/git_update.sh -v major
     - name: Configure Docker Client
       run: |-
         gcloud auth configure-docker --quiet
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
-
+    
     - name: Push Docker Image to Container Registry (GCR)
-      if: eq(github.event_name, 'push') && eq(github.ref, 'refs/heads/master') || eq(github.event_name, 'tag')
       env:
-        IMAGE_TAG: ${{ if eq(github.event_name, 'push') && eq(github.ref, 'refs/heads/master') substr(github.sha,0,7)
-                      else if eq(github.event_name, 'tag') github.ref }}
-      run: |-
-        docker tag $IMAGE_NAME:$IMAGE_TAG gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
-        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
+        GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        IMAGE_TAG: ${{ (github.event_name == 'pull_request') ? 'pull_request' : (github.event_name == 'push' ? (github.ref == 'refs/heads/master' ? substr(sha,0,7) : 'no-push') : ref) }}
+      run: |
+        if [ "$IMAGE_TAG" == "pull_request" ]; then
+          echo "Image built, but not pushed to the registry."
+        elif [ "$IMAGE_TAG" == "no-push" ]; then
+          echo "Not a push to the master branch, image not built or pushed to registry."
+        else
+          docker tag $IMAGE_NAME:$IMAGE_TAG gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
+          docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
+        fi
 
 
 # name: CI
