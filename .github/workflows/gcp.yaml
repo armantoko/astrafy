@@ -6,10 +6,10 @@ on:
     tags:
       - v*
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
       PROJECT_ID: andiamo-1d849
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Authenticate with Google Cloud
       id: 'auth'
@@ -39,12 +39,12 @@ jobs:
         
     - name: Build Docker Image , when we have pull event only this will work
        
-      if: github.ref == 'refs/heads/master' && github.event_name == 'pull_request'
+      if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
       run: 
         docker build -t $IMAGE_NAME:latest .
           
     - name: For every Commit, Tagging the image with the git commit hash and Push Docker Image to Container Registry (GCR)
-      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       env: 
         COMMIT_TAG: ${{github.sha}}  
       run: |
