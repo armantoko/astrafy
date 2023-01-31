@@ -33,12 +33,6 @@ jobs:
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
 
         
-
-    - name: Build Docker Image, and not publish for pull requests
-      if: github.ref == 'refs/heads/master' && github.event_name == 'pull_request'
-      run: docker build -t $IMAGE_NAME:latest .
-  
-
     - name: Tagging the image with the git commit hash for push requests, and Push Docker Image to Container Registry (GCR)
       if: github.ref == 'refs/heads/master' && github.event_name == 'push_request'
       env: 
@@ -51,6 +45,12 @@ jobs:
         docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
 
     
+    - name: Build Docker Image, and not publish for pull requests
+      if: github.ref == 'refs/heads/master' && github.event_name == 'pull_request'
+      run: docker build -t $IMAGE_NAME:latest .
+  
+
+
 
     - name: Push Docker Image to Container Registry (GCR)
       if: github.ref == 'refs/tags/*' && (github.event_name == 'create' || github.event_name == 'delete')
