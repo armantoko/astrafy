@@ -9,28 +9,27 @@ on:
     branches:
       - master
 
-env:
-  GOOGLE_REGISTRY: gcr.io
-  PROJECT_ID: my-project-id
-  IMAGE_NAME: linux_tweet_app
-  GITHUB_REF: ${{github.ref}}
-  GOOGLE_CREDENTIALS: ${{ secrets.SERVICE_ACOUNT_KEY }}
-  GOOGLE_PROJECT_ID: my-project-id
+# env:
+#   GOOGLE_REGISTRY: gcr.io
+#   PROJECT_ID: andiamo-1d849
+#   IMAGE_NAME: linux_tweet_app
+#   GITHUB_REF: ${{github.ref}}
+#   GOOGLE_CREDENTIALS: ${{ secrets.SERVICE_ACOUNT_KEY }}
+#   GOOGLE_PROJECT_ID: my-project-id
 
 
 jobs:
-  build_and_publish:
+  build-push-gcr:
+    name: Build and Push to GCP
     runs-on: ubuntu-latest
-
+    env:
+      IMAGE_NAME: linux_tweet_app
+      PROJECT_ID: andiamo-1d849
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
-
-  - name: Authenticate with JSON credentials
-    uses: google-github-actions/auth@v1
-    with:
-      credentials_json: ${{ andiamo-1d849-bac131c64623 }}
-
-    - name: Build Docker Image
-      run: docker build -t $IMAGE_NAME:latest .
+    - uses: google-github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.SERVICE_ACOUNT_KEY }}
+        project_id: ${{ env.PROJECT_ID }}
