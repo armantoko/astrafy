@@ -45,7 +45,7 @@ jobs:
           docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
           docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
           docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-          echo  ${{github.event}}
+          echo  ${{github.event_name}}
         fi
       shell: bash
     
