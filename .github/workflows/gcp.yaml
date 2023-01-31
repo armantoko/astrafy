@@ -34,10 +34,10 @@ jobs:
         gcloud auth configure-docker --quiet
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
         
-    - name: Build Docker Image
+    - name: Build Docker Image , when we have pull event only this will work
       run: docker build -t $IMAGE_NAME:latest .
 
-    - name: Tagging the image with the git commit hash and Push Docker Image to Container Registry (GCR) for push events
+    - name: For every Commit, Tagging the image with the git commit hash and Push Docker Image to Container Registry (GCR)
       if: github.ref == 'refs/heads/master' && (github.event_name == 'push_request')
       env: 
         COMMIT_TAG: ${{github.sha}}
@@ -47,10 +47,12 @@ jobs:
         docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
         docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
     
-    - name: Push Docker Image to Container Registry (GCR) for tag events
+    - name: For every git Tag, Build, Tag and publish Docker Image and push to Container Registry (GCR)
       if: github.ref == 'refs/tags/*' && (github.event_name == 'create' || github.event_name == 'delete')
       env:
         GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
       run: |-
         docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
         docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
