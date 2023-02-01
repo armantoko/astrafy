@@ -52,7 +52,7 @@ jobs:
         --location=us-central1
         docker build -t $IMAGE_NAME:latest .
         docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/my-repo:latest
-        docker push gcr.io/$PROJECT_ID/my-repo:latest
+        docker push gcr.io/$PROJECT_ID/my-repo:latest 
 
 
     #docker build -t $IMAGE_NAME:latest .
