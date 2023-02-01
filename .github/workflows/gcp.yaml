@@ -50,9 +50,7 @@ jobs:
       env: 
         COMMIT_TAG: ${{github.sha}}  
       run: |
-# gcloud artifacts repositories create my-repo \
-  # --repository-format=docker \
-  # --location=us-central1
+
         docker build -t $IMAGE_NAME:latest .
         docker tag $IMAGE_NAME:latest us-central1-docker.pkg.dev/$PROJECT_ID/my-repo:latest
 
@@ -62,6 +60,9 @@ jobs:
     #docker build -t $IMAGE_NAME:latest .
     #gcloud projects add-iam-policy-binding $PROJECT_ID --member=$PRINCIPAL --role=roles/artifactregistry.repoAdmin
     # gcloud auth configure-docker europe-docker.pkg.dev
+    # gcloud artifacts repositories create my-repo \
+  # --repository-format=docker \
+  # --location=us-central1
   # docker tag $IMAGE_NAME:latest eu.gcr.io/andiamo-1d849/$IMAGE_NAME:latest
     #docker push  eu.gcr.io/andiamo-1d849/$IMAGE_NAME:latest
    # docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$COMMIT_TAG
