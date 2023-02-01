@@ -52,6 +52,7 @@ jobs:
       run: |
 
         docker build -t linux_tweet_app:latest .
+        gcloud auth configure-docker us-central1-docker.pkg.dev
         docker tag linux_tweet_app:latest us-central1-docker.pkg.dev/andiamo-1d849/my-repo:latest
         docker push us-central1-docker.pkg.dev/andiamo-1d849/my-repo
 
