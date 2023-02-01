@@ -19,7 +19,7 @@ jobs:
     env:
       IMAGE_NAME: linux_tweet_app
       PROJECT_ID: andiamo-1d849
-      PRINCIPAL: github-actions@andiamo-1d849.iam.gserviceaccount.com
+      PRINCIPAL: github-actions@$PROJECT_ID.iam.gserviceaccount.com
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -37,7 +37,6 @@ jobs:
         gcloud auth configure-docker us-east1-docker.pkg.dev
       #gcloud auth configure-docker europe-docker.pkg.dev
     
-      #
         
     - name: Build Docker Image , when we have pull event only this will work
        
@@ -52,8 +51,8 @@ jobs:
       run: |
 
         docker build -t $IMAGE_NAME:$COMMIT_TAG .
-        docker tag $IMAGE_NAME:$COMMIT_TAG us-east1-docker.pkg.dev/andiamo-1d849/my-repo/$IMAGE_NAME:$COMMIT_TAG
-        docker push us-east1-docker.pkg.dev/andiamo-1d849/my-repo/$IMAGE_NAME:$COMMIT_TAG
+        docker tag $IMAGE_NAME:$COMMIT_TAG us-east1-docker.pkg.dev/$PROJECT_ID/my-repo/$IMAGE_NAME:$COMMIT_TAG
+        docker push us-east1-docker.pkg.dev/$PROJECT_ID/my-repo/$IMAGE_NAME:$COMMIT_TAG
   # gcloud artifacts repositories create my-repo \
   # --repository-format=docker \
   # --location=us-east1
@@ -62,8 +61,8 @@ jobs:
     # gcloud artifacts repositories create my-repo \
   # --repository-format=docker \
   # --location=us-central1
-  # docker tag $IMAGE_NAME:latest eu.gcr.io/andiamo-1d849/$IMAGE_NAME:latest
-    #docker push  eu.gcr.io/andiamo-1d849/$IMAGE_NAME:latest
+  # docker tag $IMAGE_NAME:latest eu.gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+    #docker push  eu.gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
    # docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$$COMMIT_TAG
    # docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
    # docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$$COMMIT_TAG
