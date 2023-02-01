@@ -51,9 +51,9 @@ jobs:
         COMMIT_TAG: ${{github.sha}}  
       run: |
 
-        docker build -t linux_tweet_app:latest .
+        docker build -t linux_tweet_app .
         gcloud auth configure-docker us-central1-docker.pkg.dev
-        docker tag linux_tweet_app:latest us-central1-docker.pkg.dev/andiamo-1d849/my-repo:latest
+        docker tag linux_tweet_app us-central1-docker.pkg.dev/andiamo-1d849/my-repo
         docker push us-central1-docker.pkg.dev/andiamo-1d849/my-repo/linux_tweet_app
 
     #docker build -t $IMAGE_NAME:latest .
