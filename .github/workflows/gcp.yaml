@@ -36,7 +36,7 @@ jobs:
       #gcloud auth configure-docker europe-docker.pkg.dev
         
     - name: When we have a pull event, we Build Docker Image and dont publish it.
-      if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request'
       run: 
         docker build -t $IMAGE_NAME:latest .
           
