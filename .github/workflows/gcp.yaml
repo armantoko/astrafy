@@ -52,8 +52,8 @@ jobs:
       run: |
 
         docker build -t my-image .
-        docker tag my-image us-east1-docker.pkg.dev/my-project/my-repo/test-image
-        docker push us-east1-docker.pkg.dev/my-project/my-repo/test-image
+        docker tag my-image us-east1-docker.pkg.dev/andiamo-1d849/my-repo/test-image
+        docker push us-east1-docker.pkg.dev/andiamo-1d849/my-repo/test-image
 
     #docker build -t $IMAGE_NAME:latest .
     #gcloud projects add-iam-policy-binding $PROJECT_ID --member=$PRINCIPAL --role=roles/artifactregistry.repoAdmin
