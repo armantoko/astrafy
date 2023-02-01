@@ -19,7 +19,7 @@ jobs:
     env:
       IMAGE_NAME: linux_tweet_app
       PROJECT_ID: andiamo-1d849
-      PRINCIPAL: github-actions@$PROJECT_ID.iam.gserviceaccount.com
+      REPOSITORY: my-repo
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -32,28 +32,23 @@ jobs:
   
     - name: Configure Docker Client
       run: |-
-        
-       
         gcloud auth configure-docker us-east1-docker.pkg.dev
       #gcloud auth configure-docker europe-docker.pkg.dev
-    
         
-    - name: Build Docker Image , when we have pull event only this will work
-       
+    - name: When we have a pull event, we Build Docker Image and dont publish it.
       if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
       run: 
         docker build -t $IMAGE_NAME:latest .
           
-    - name: For every Commit, Tagging the image with the git commit hash and Push Docker Image to Container Registry (GCR)
+    - name: For every Commit, Tagging the image with the git commit hash and Push Docker Image to Artifact Registry
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       env: 
         COMMIT_TAG: ${{github.sha}}  
       run: |
-
         docker build -t $IMAGE_NAME:$COMMIT_TAG .
-        docker tag $IMAGE_NAME:$COMMIT_TAG us-east1-docker.pkg.dev/$PROJECT_ID/my-repo/$IMAGE_NAME:$COMMIT_TAG
-        docker push us-east1-docker.pkg.dev/$PROJECT_ID/my-repo/$IMAGE_NAME:$COMMIT_TAG
-  # gcloud artifacts repositories create my-repo \
+        docker tag $IMAGE_NAME:$COMMIT_TAG us-east1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$COMMIT_TAG
+        docker push us-east1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$COMMIT_TAG
+  # gcloud artifacts repositories create $REPOSITORY \
   # --repository-format=docker \
   # --location=us-east1
       shell: bash
@@ -64,6 +59,6 @@ jobs:
         GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
       run: |
         docker build -t $IMAGE_NAME:$GIT_TAG .
-        docker tag $IMAGE_NAME:$GIT_TAG us-east1-docker.pkg.dev/$PROJECT_ID/my-repo/$IMAGE_NAME:$GIT_TAG
-        docker push us-east1-docker.pkg.dev/$PROJECT_ID/my-repo/$IMAGE_NAME:$GIT_TAG
+        docker tag $IMAGE_NAME:$GIT_TAG us-east1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$GIT_TAG
+        docker push us-east1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$GIT_TAG
       shell: bash
