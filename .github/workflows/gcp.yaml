@@ -54,8 +54,9 @@ jobs:
         --repository-format=docker \
         --location=us-central1
         docker build -t $IMAGE_NAME:latest .
-        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/my-repo:latest
-        docker push gcr.io/$PROJECT_ID/my-repo:latest
+        docker tag $IMAGE_NAME:latest us-central1-docker.pkg.dev/$PROJECT_ID/my-repo:latest
+
+        docker push us-central1-docker.pkg.dev/$PROJECT_ID/my-repo:latest
 
 
     #docker build -t $IMAGE_NAME:latest .
