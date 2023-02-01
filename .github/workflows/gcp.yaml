@@ -50,7 +50,9 @@ jobs:
       env: 
         COMMIT_TAG: ${{github.sha}}  
       run: |
-
+        gcloud artifacts repositories create my-repo \
+        --repository-format=docker \
+        --location=us-east1
         docker build -t my-image .
         docker tag my-image us-east1-docker.pkg.dev/andiamo-1d849/my-repo/my-image
         docker push us-east1-docker.pkg.dev/andiamo-1d849/my-repo/my-image
