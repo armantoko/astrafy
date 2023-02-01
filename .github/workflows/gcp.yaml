@@ -51,7 +51,7 @@ jobs:
         COMMIT_TAG: ${{github.sha}}  
       run: |
 
-        docker build -t us-east1-docker.pkg.dev/my-project/my-repo/test-image .
+        docker build -t my-image .
         docker tag my-image us-east1-docker.pkg.dev/my-project/my-repo/test-image
         docker push us-east1-docker.pkg.dev/my-project/my-repo/test-image
 
