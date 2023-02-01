@@ -50,9 +50,9 @@ jobs:
       env: 
         COMMIT_TAG: ${{github.sha}}  
       run: |
-        gcloud artifacts repositories create my-repo \
-        --repository-format=docker \
-        --location=us-central1
+# gcloud artifacts repositories create my-repo \
+  # --repository-format=docker \
+  # --location=us-central1
         docker build -t $IMAGE_NAME:latest .
         docker tag $IMAGE_NAME:latest us-central1-docker.pkg.dev/$PROJECT_ID/my-repo:latest
 
