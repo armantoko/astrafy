@@ -34,7 +34,7 @@ jobs:
       run: |-
         gcloud auth configure-docker --quiet
         gcloud auth configure-docker europe-docker.pkg.dev/andiamo-1d849/eu.gcr.io --quiet
-        gcloud projects add-iam-policy-binding $PROJECT_ID --member=$PRINCIPAL --role=roles/artifactregistry.repoAdmin
+      #gcloud projects add-iam-policy-binding $PROJECT_ID --member=$PRINCIPAL --role=roles/artifactregistry.repoAdmin
         
     - name: Build Docker Image , when we have pull event only this will work
        
