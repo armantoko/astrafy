@@ -51,10 +51,10 @@ jobs:
         COMMIT_TAG: ${{github.sha}}  
       run: |
 
-        docker build -t $IMAGE_NAME:latest .
-        docker tag $IMAGE_NAME:latest us-central1-docker.pkg.dev/$PROJECT_ID/my-repo:latest
+        docker build -t linux_tweet_app:latest .
+        docker tag linux_tweet_app:latest us-central1-docker.pkg.dev/andiamo-1d849/my-repo:latest
 
-        docker push us-central1-docker.pkg.dev/$PROJECT_ID/my-repo:latest
+        docker push us-central1-docker.pkg.dev/andiamo-1d849/my-repo/linux_tweet_app:latest
 
 
     #docker build -t $IMAGE_NAME:latest .
