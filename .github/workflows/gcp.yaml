@@ -51,9 +51,9 @@ jobs:
         COMMIT_TAG: ${{github.sha}}  
       run: |
 
-        docker build -t linux_tweet_app:$COMMIT_TAG .
-        docker tag linux_tweet_app:$COMMIT_TAG us-east1-docker.pkg.dev/andiamo-1d849/my-repo/linux_tweet_app:$COMMIT_TAG
-        docker push us-east1-docker.pkg.dev/andiamo-1d849/my-repo/linux_tweet_app:$COMMIT_TAG
+        docker build -t $IMAGE_NAME:$COMMIT_TAG .
+        docker tag $IMAGE_NAME:$COMMIT_TAG us-east1-docker.pkg.dev/andiamo-1d849/my-repo/$IMAGE_NAME:$COMMIT_TAG
+        docker push us-east1-docker.pkg.dev/andiamo-1d849/my-repo/$IMAGE_NAME:$COMMIT_TAG
   # gcloud artifacts repositories create my-repo \
   # --repository-format=docker \
   # --location=us-east1
